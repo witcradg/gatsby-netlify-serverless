@@ -2,10 +2,12 @@
 const Client = require('pg/lib/client.js');
 
 const penv = process.env;
-console.log({ penv });
 
 const setCredentials = () => {
 	let setCredentials = {};
+
+    // console.log('process.env.DB_MODE', process.env.DB_MODE)
+
 	switch (process.env.DB_MODE) {
 		case 'dev':
 			setCredentials = {
@@ -45,26 +47,26 @@ const setCredentials = () => {
 };
 
 let client = new Client(setCredentials());
+console.log('client', client)
 
 const validateEmail = (email) => {
-	return String(email)
-		.toLowerCase()
-		.match(
-			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-		);
+    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ ;
+	return regex.test(email)
 };
 
 const submitNewsletter = async (body) => {
-	const validatedEmail = validateEmail(body.formFields.email);
 
-	if (validatedEmail) {
+    if (validateEmail(body.formFields.email)) {
+        const validatedEmail = body.formFields.email.toLowerCase()
 		await client.connect();
-		await client.query('INSERT into newsletter (email, create_date) values ($1, now())', [ validatedEmail[0] ]);
+		// await client.query('INSERT into newsletter (email, create_date) values ($1, now())', [ validatedEmail[0] ]);
 	}
 };
 
 const submitHire = async (body) => {
+    console.log('body.formFields.email', body.formFields.email)
 	const validatedEmail = validateEmail(body.formFields.email);
+    console.log('validatedEmail', validatedEmail)
 
 	if (validatedEmail) {
 		await client.connect();
@@ -146,7 +148,7 @@ const submitContact = async (body) => {
 
 const submitPromotion = async (body) => {
 	const validatedEmail = validateEmail(body.formFields.email);
-	console.log(body);
+	// console.log(body);
 	if (validatedEmail) {
 		await client.connect();
 		await client.query(
@@ -176,6 +178,8 @@ const submitPromotion = async (body) => {
 module.exports.handler = async (event, context) => {
 	context.callbackWaitsForEmptyEventLoop = false;
 	const body = JSON.parse(event.body);
+
+    // console.log(body)
 
 	let statusCd = 400;
 	let bdy = 'invalid';
