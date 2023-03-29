@@ -6,7 +6,8 @@ const penv = process.env;
 const setCredentials = () => {
 	let setCredentials = {};
 
-    console.log('process.env.DB_MODE', process.env.DB_MODE)
+    // console.log('process.env.DB_MODE', process.env.DB_MODE)
+    // console.log('process.env', process.env)
 
 	switch (process.env.DB_MODE) {
 		case 'dev':
@@ -35,9 +36,9 @@ const setCredentials = () => {
 			break;
 		default:
 			setCredentials = {
-				user: 'd8g_user',
-				host: 'dpg-cbc45t8ivq0c5o1auisg-a.oregon-postgres.render.com',
-				database: 'd8g',
+				user: '',
+				host: '',
+				database: '',
 				password: '',
 				port: 5432,
                 ssl: {
@@ -46,12 +47,12 @@ const setCredentials = () => {
 			};
 			break;
 	}
-    console.log(setCredentials)
+    // console.log(setCredentials)
 	return setCredentials;
 };
 
 let client = new Client(setCredentials());
-console.log('client', client)
+// console.log('client', client)
 
 const validateEmail = (email) => {
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ ;
@@ -221,7 +222,6 @@ module.exports.handler = async (event, context) => {
 	} finally {
 		await client.end();
 		client = null;
-		console.log('success');
 	}
 
 	return {
