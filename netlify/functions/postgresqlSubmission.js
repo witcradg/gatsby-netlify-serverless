@@ -6,7 +6,7 @@ const penv = process.env;
 const setCredentials = () => {
 	let setCredentials = {};
 
-    // console.log('process.env.DB_MODE', process.env.DB_MODE)
+    console.log('process.env.DB_MODE', process.env.DB_MODE)
 
 	switch (process.env.DB_MODE) {
 		case 'dev':
@@ -16,7 +16,7 @@ const setCredentials = () => {
 				database: process.env.PGD_DB,
 				password: process.env.PGD_PASSWORD,
 				port: process.env.PGD_PORT,
-				ssl: {
+                ssl: {
 					rejectUnauthorized: false
 				}
 			};
@@ -28,21 +28,25 @@ const setCredentials = () => {
 				database: process.env.PGD_DB,
 				password: process.env.PGD_PASSWORD,
 				port: process.env.PGD_PORT,
-				ssl: {
+                ssl: {
 					rejectUnauthorized: false
 				}
 			};
 			break;
 		default:
 			setCredentials = {
-				user: 'postgres',
-				host: 'localhost',
-				database: 'test2',
-				password: 'test2pw',
-				port: 5432
+				user: 'd8g_user',
+				host: 'dpg-cbc45t8ivq0c5o1auisg-a.oregon-postgres.render.com',
+				database: 'd8g',
+				password: '',
+				port: 5432,
+                ssl: {
+					rejectUnauthorized: false
+				}
 			};
 			break;
 	}
+    console.log(setCredentials)
 	return setCredentials;
 };
 
@@ -55,18 +59,18 @@ const validateEmail = (email) => {
 };
 
 const submitNewsletter = async (body) => {
-
     if (validateEmail(body.formFields.email)) {
         const validatedEmail = body.formFields.email.toLowerCase()
+        console.log('validatedEmail: ', validatedEmail)
 		await client.connect();
-		// await client.query('INSERT into newsletter (email, create_date) values ($1, now())', [ validatedEmail[0] ]);
+		await client.query('INSERT into newsletter (email, create_date) values ($1, now())', [ validatedEmail ]);
 	}
 };
 
 const submitHire = async (body) => {
-    console.log('body.formFields.email', body.formFields.email)
+    // console.log('body.formFields.email', body.formFields.email)
 	const validatedEmail = validateEmail(body.formFields.email);
-    console.log('validatedEmail', validatedEmail)
+    // console.log('validatedEmail', validatedEmail)
 
 	if (validatedEmail) {
 		await client.connect();
@@ -217,6 +221,7 @@ module.exports.handler = async (event, context) => {
 	} finally {
 		await client.end();
 		client = null;
+		console.log('success');
 	}
 
 	return {
